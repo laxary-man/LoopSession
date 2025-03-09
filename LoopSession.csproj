@@ -59,7 +59,7 @@
 
   <!-- Set to 'false' to include generated files, 'true' to exclude them -->
   <PropertyGroup>
-    <ExcludeGeneratedFiles>false</ExcludeGeneratedFiles>
+    <ExcludeGeneratedFiles>true</ExcludeGeneratedFiles>
   </PropertyGroup>
 
   <!-- Excluding generated files can help reduce clutter in the build output and improve build performance, 
