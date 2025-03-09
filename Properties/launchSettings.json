@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "LoopSession (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "LoopSession (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
