@@ -56,4 +56,20 @@
     <PublishTrimmed Condition="'$(Configuration)' == 'Debug'">False</PublishTrimmed>
     <PublishTrimmed Condition="'$(Configuration)' != 'Debug'">True</PublishTrimmed>
   </PropertyGroup>
+
+  <!-- Set to 'false' to include generated files, 'true' to exclude them -->
+  <PropertyGroup>
+    <ExcludeGeneratedFiles>false</ExcludeGeneratedFiles>
+  </PropertyGroup>
+
+  <!-- Excluding generated files can help reduce clutter in the build output and improve build performance, 
+       but it may also hide important generated code needed for the build. 
+       Just change the condition value to '!=' to toggle -->
+  <ItemGroup Condition="'$(ExcludeGeneratedFiles)' == 'true'">
+    <None Remove="**\*.g.cs" />
+    <None Remove="**\*.g.i.cs" />
+    <Compile Remove="**\*.g.cs" />
+    <Compile Remove="**\*.g.i.cs" />
+  </ItemGroup>
+  
 </Project>
