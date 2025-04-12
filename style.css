@@ -2,7 +2,8 @@ body {
   font-family: sans-serif;
   margin: 0;
   padding: 20px;
-  background-color: #f0f0f0;
+  background-color: #1e1e1e; /* Dark background */
+  color: #f0f0f0; /* Light text */
   display: flex;
   flex-direction: column;
   height: 100vh;
@@ -11,36 +12,37 @@ body {
 
 h1 {
   text-align: center;
-  color: #333;
+  color: #cccccc; /* Lighter heading color */
 }
 
 #session-container {
   flex-grow: 1;
   overflow-y: auto;
-  border: 1px solid #ccc;
-  background-color: #fff;
+  border: 1px solid #444; /* Darker border */
+  background-color: #2a2a2a; /* Dark container background */
   margin-bottom: 10px;
   padding: 10px;
   border-radius: 5px;
 }
 
 .block {
-  border: 1px solid #ddd;
+  border: 1px solid #555; /* Darker block border */
   padding: 10px;
   margin-bottom: 5px;
   border-radius: 3px;
-  background-color: #e9e9e9;
+  background-color: #333; /* Dark block background */
+  color: #f0f0f0; /* Light text in blocks */
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
 .block.task {
-  border-left: 5px solid #4caf50; /* Green for Task */
+  border-left: 5px solid #4caf50; /* Keep task color */
 }
 
 .block.break {
-  border-left: 5px solid #2196f3; /* Blue for Break */
+  border-left: 5px solid #2196f3; /* Keep break color */
 }
 
 .block-controls button {
@@ -52,8 +54,8 @@ h1 {
 #timer-display {
   margin-top: 10px;
   padding: 10px;
-  background-color: #fff;
-  border: 1px solid #ccc;
+  background-color: #2a2a2a; /* Dark container background */
+  border: 1px solid #444; /* Darker border */
   border-radius: 5px;
   text-align: center;
 }
@@ -61,6 +63,7 @@ h1 {
 #timer-display {
   font-size: 2em;
   font-weight: bold;
+  color: #e0e0e0; /* Slightly adjusted timer text color */
 }
 
 button {
@@ -69,22 +72,48 @@ button {
   cursor: pointer;
   border: none;
   border-radius: 3px;
-  background-color: #555;
-  color: white;
+  background-color: #555; /* Darker button background */
+  color: #f0f0f0; /* Light button text */
 }
 
 button:hover {
-  background-color: #777;
+  background-color: #777; /* Lighter hover background */
+}
+
+button:disabled {
+  background-color: #444; /* Darker disabled background */
+  color: #888; /* Dimmed disabled text */
+  cursor: not-allowed;
 }
 
 input[type="text"],
 input[type="number"] {
   padding: 8px;
   margin-right: 5px;
-  border: 1px solid #ccc;
+  border: 1px solid #555; /* Darker input border */
   border-radius: 3px;
+  background-color: #333; /* Dark input background */
+  color: #f0f0f0; /* Light input text */
+}
+
+/* Style for highlighted block (adjust if needed) */
+.block[style*="background-color: rgb(192, 192, 192)"] {
+  background-color: #4a4a4a !important; /* Darker highlight */
+  font-weight: bold;
 }
 
 /* TODO: Add animations for block transitions and timer updates */
 /* TODO: Add styles for drag and drop indicators */
-/* TODO: Add styles for progress bar */
+/* TODO: Add styles for progress bar (ensure visibility in dark mode) */
+#progress-bar-container {
+  /* ... existing styles ... */
+  background-color: #555; /* Dark background for container */
+  border-radius: 3px;
+  margin-top: 5px;
+}
+
+#progress-bar {
+  /* ... existing styles ... */
+  background-color: #4caf50; /* Keep progress bar color or choose another visible one */
+  border-radius: 3px;
+}
