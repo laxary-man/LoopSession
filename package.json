@@ -1,0 +1,23 @@
+{
+  "name": "loopsession",
+  "version": "1.0.0",
+  "description": "LoopSession, Block-stackable Timer",
+  "keywords": [
+    "timer"
+  ],
+  "homepage": "https://github.com/laxary-man/LoopSession#readme",
+  "bugs": {
+    "url": "https://github.com/laxary-man/LoopSession/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/laxary-man/LoopSession.git"
+  },
+  "license": "MIT",
+  "author": "laxaryman",
+  "type": "commonjs",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
