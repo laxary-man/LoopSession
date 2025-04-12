@@ -2,10 +2,62 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>Hello World App</title>
+    <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'"
+    />
+    <meta
+      http-equiv="X-Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'"
+    />
+    <title>LoopSession</title>
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <h1>Electron Test App</h1>
-    <p>The "Hello World!" dialog should appear shortly.</p>
+    <h1>LoopSession</h1>
+
+    <div id="session-container">
+      <!-- Task and Break blocks will be added here -->
+      <p>세션을 구성하세요. Task 또는 Break 블록을 추가할 수 있습니다.</p>
+    </div>
+
+    <div id="controls">
+      <input type="text" id="task-desc" placeholder="태스크 설명" />
+      <input type="number" id="task-duration" placeholder="시간(분)" min="1" />
+      <button id="add-task-btn">Task 추가</button>
+      <br /><br />
+      <input
+        type="number"
+        id="break-duration"
+        placeholder="휴식 시간(분)"
+        min="1"
+        value="5"
+      />
+      <button id="add-break-btn">Break 추가</button>
+      <br /><br />
+      <label for="repetitions">반복 횟수:</label>
+      <input type="number" id="repetitions" value="1" min="1" />
+      <br /><br />
+      <button id="start-session-btn">세션 시작</button>
+      <button id="pause-session-btn" disabled>일시정지</button>
+      <button id="reset-session-btn" disabled>초기화</button>
+    </div>
+
+    <div id="timer-display">
+      <span id="current-block-type">대기 중</span>:
+      <span id="time-left">00:00</span>
+      <div id="progress-bar-container" style="display: none">
+        <div
+          id="progress-bar"
+          style="width: 0%; height: 10px; background-color: green"
+        ></div>
+      </div>
+    </div>
+
+    <!-- TODO: Add elements for session progress visualization -->
+    <!-- TODO: Add elements for notifications -->
+
+    <script src="renderer.js"></script>
   </body>
 </html>
