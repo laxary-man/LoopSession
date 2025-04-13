@@ -22,23 +22,39 @@
       <p>세션을 구성하세요. Task 또는 Break 블록을 추가할 수 있습니다.</p>
     </div>
 
-    <div id="controls">
-      <input type="text" id="task-desc" placeholder="태스크 설명" />
-      <input type="number" id="task-duration" placeholder="시간(분)" min="1" />
-      <button id="add-task-btn">Task 추가</button>
-      <br /><br />
-      <input
-        type="number"
-        id="break-duration"
-        placeholder="휴식 시간(분)"
-        min="1"
-        value="5"
-      />
-      <button id="add-break-btn">Break 추가</button>
-      <br /><br />
-      <label for="repetitions">반복 횟수:</label>
-      <input type="number" id="repetitions" value="1" min="1" />
-      <br /><br />
+    <!-- Configuration Popup -->
+    <div id="config-popup" class="popup">
+      <h2>세션 구성</h2>
+      <div id="config-controls">
+        <input type="text" id="task-desc" placeholder="태스크 설명" />
+        <input
+          type="number"
+          id="task-duration"
+          placeholder="시간(분)"
+          min="1"
+        />
+        <button id="add-task-btn">Task 추가</button>
+        <br /><br />
+        <input
+          type="number"
+          id="break-duration"
+          placeholder="휴식 시간(분)"
+          min="1"
+          value="5"
+        />
+        <button id="add-break-btn">Break 추가</button>
+        <br /><br />
+        <label for="repetitions">반복 횟수:</label>
+        <input type="number" id="repetitions" value="1" min="1" />
+      </div>
+      <br />
+      <button id="close-config-btn">닫기</button>
+      <!-- TODO: Add functionality for editing and deleting blocks within the popup -->
+    </div>
+
+    <!-- Main Controls -->
+    <div id="main-controls">
+      <button id="open-config-btn">세션 구성</button>
       <button id="start-session-btn">세션 시작</button>
       <button id="pause-session-btn" disabled>일시정지</button>
       <button id="reset-session-btn" disabled>초기화</button>

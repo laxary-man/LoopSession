@@ -1,9 +1,16 @@
 const { contextBridge, ipcRenderer } = require("electron");
 
-// 초기에는 노출할 API가 없을 수 있습니다.
-// 필요에 따라 여기에 API를 정의합니다. 예:
-// contextBridge.exposeInMainWorld('electronAPI', {
-//   sendNotification: (message) => ipcRenderer.send('notify', message)
-// });
+contextBridge.exposeInMainWorld("electronAPI", {
+  // Main window -> Main process: Request to open config window
+  openConfigWindow: () => ipcRenderer.send("open-config-window"),
 
-console.log("Preload script loaded.");
+  // Main window <- Main process: Receive saved config data
+  onConfigData: (callback) =>
+    ipcRenderer.on("config-data", (_event, value) => callback(value)),
+
+  // Config window -> Main process: Send config data to save
+  sendConfigData: (data) => ipcRenderer.send("save-config-data", data),
+
+  // Config window -> Main process: Request to close itself
+  closeConfigWindow: () => ipcRenderer.send("close-config-window"),
+});

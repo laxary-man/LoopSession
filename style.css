@@ -117,3 +117,60 @@ input[type="number"] {
   background-color: #4caf50; /* Keep progress bar color or choose another visible one */
   border-radius: 3px;
 }
+
+/* Popup Styles */
+.popup {
+  display: none; /* Hidden by default */
+  position: fixed; /* Stay in place */
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  /* border: 1px solid #ccc; */ /* Original border */
+  border: 1px solid #555; /* Darker border for dark mode */
+  padding: 20px;
+  /* background-color: white; */ /* Original background */
+  background-color: #2a2a2a; /* Dark background like other containers */
+  color: #f0f0f0; /* Light text color */
+  z-index: 1000; /* Sit on top */
+  /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */ /* Original shadow */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4); /* Adjusted shadow for dark mode */
+  border-radius: 5px; /* Add rounded corners */
+  min-width: 300px; /* Ensure minimum width */
+}
+
+.popup.show {
+  display: block; /* Show when .show class is added */
+}
+
+/* Style popup header */
+.popup h2 {
+  margin-top: 0;
+  color: #cccccc; /* Lighter heading color */
+  border-bottom: 1px solid #444; /* Separator line */
+  padding-bottom: 10px;
+  margin-bottom: 15px;
+}
+
+#config-controls input,
+#config-controls button,
+#config-controls label {
+  margin-bottom: 10px;
+  display: block; /* Make labels and inputs block elements for better spacing */
+  width: calc(100% - 16px); /* Adjust width considering padding */
+}
+
+#config-controls input {
+  margin-bottom: 15px; /* More space after inputs */
+}
+
+#config-controls button {
+  width: auto; /* Allow buttons to size based on content */
+  display: inline-block; /* Place buttons side-by-side if needed */
+  margin-right: 10px;
+}
+
+/* Style the close button */
+#close-config-btn {
+  margin-top: 15px; /* Add space above the close button */
+  float: right; /* Position close button to the right */
+}
