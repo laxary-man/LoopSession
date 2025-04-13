@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'"
+    />
+    <title>세션 구성</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+      }
+      input[type="number"],
+      input[type="text"] {
+        width: 95%;
+        padding: 8px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      button {
+        padding: 10px 15px;
+        margin-right: 10px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .save-button {
+        background-color: #4caf50;
+        color: white;
+      }
+      .cancel-button {
+        background-color: #f44336;
+        color: white;
+      }
+
+      /* Dark Mode Styles */
+      @media (prefers-color-scheme: dark) {
+        body {
+          background-color: #333;
+          color: #eee;
+        }
+        input[type="number"],
+        input[type="text"] {
+          background-color: #555;
+          color: #eee;
+          border-color: #777;
+        }
+        .save-button {
+          background-color: #388e3c; /* Darker green */
+        }
+        .cancel-button {
+          background-color: #d32f2f; /* Darker red */
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>세션 구성</h1>
+
+    <form id="config-form">
+      <div>
+        <label for="session-duration">세션 시간 (분):</label>
+        <input
+          type="number"
+          id="session-duration"
+          name="sessionDuration"
+          value="25"
+          min="1"
+        />
+      </div>
+      <div>
+        <label for="break-duration">휴식 시간 (분):</label>
+        <input
+          type="number"
+          id="break-duration"
+          name="breakDuration"
+          value="5"
+          min="1"
+        />
+      </div>
+      <!-- TODO: Add more configuration options as needed -->
+
+      <button type="submit" class="save-button">저장</button>
+      <button type="button" id="cancel-button" class="cancel-button">
+        취소
+      </button>
+    </form>
+
+    <script>
+      // Ensure the preload script has exposed the API
+      if (window.electronAPI) {
+        const form = document.getElementById("config-form");
+        const cancelButton = document.getElementById("cancel-button");
+
+        form.addEventListener("submit", (event) => {
+          event.preventDefault(); // Prevent default form submission
+          const formData = new FormData(form);
+          const configData = {
+            sessionDuration: parseInt(formData.get("sessionDuration"), 10),
+            breakDuration: parseInt(formData.get("breakDuration"), 10),
+            // TODO: Retrieve other config values
+          };
+          // TODO: Add input validation before sending
+          window.electronAPI.sendConfigData(configData); // Use exposed API
+        });
+
+        cancelButton.addEventListener("click", () => {
+          window.electronAPI.closeConfigWindow(); // Use exposed API
+        });
+      } else {
+        console.error(
+          "electronAPI is not available. Check preload.js and contextIsolation settings."
+        );
+        // Optionally, display an error message to the user in the config window itself
+        const body = document.querySelector("body");
+        const errorDiv = document.createElement("div");
+        errorDiv.textContent =
+          "오류: 설정을 저장하거나 창을 닫을 수 없습니다. preload 스크립트를 확인하세요.";
+        errorDiv.style.color = "red";
+        errorDiv.style.marginTop = "20px";
+        body.appendChild(errorDiv);
+      }
+    </script>
+  </body>
+</html>

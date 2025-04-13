@@ -1,6 +1,4 @@
 const sessionContainer = document.getElementById("session-container");
-const addTaskBtn = document.getElementById("add-task-btn");
-const addBreakBtn = document.getElementById("add-break-btn");
 const taskDescInput = document.getElementById("task-desc");
 const taskDurationInput = document.getElementById("task-duration");
 const breakDurationInput = document.getElementById("break-duration");
@@ -12,8 +10,6 @@ const currentBlockTypeSpan = document.getElementById("current-block-type");
 const timeLeftSpan = document.getElementById("time-left");
 // TODO: Get progress bar elements
 const openConfigBtn = document.getElementById("open-config-btn");
-const closeConfigBtn = document.getElementById("close-config-btn");
-const configPopup = document.getElementById("config-popup");
 
 let sessionBlocks = []; // Array to hold block objects { type: 'task'/'break', description: '...', duration: seconds }
 let currentBlockIndex = -1;
@@ -241,6 +237,8 @@ function highlightCurrentBlock(index) {
 }
 
 function disableEditing(disabled) {
+  const addTaskBtn = document.getElementById("add-task-btn");
+  const addBreakBtn = document.getElementById("add-break-btn");
   addTaskBtn.disabled = disabled;
   addBreakBtn.disabled = disabled;
   taskDescInput.disabled = disabled;
@@ -257,46 +255,38 @@ function disableEditing(disabled) {
 
 // --- Event Listeners ---
 openConfigBtn.addEventListener("click", () => {
-  configPopup.classList.add("show");
+  // configPopup.classList.add("show"); // <-- 삭제
   // Optional: Show backdrop if implemented
   // document.getElementById('popup-backdrop').classList.add('show');
-});
-
-closeConfigBtn.addEventListener("click", () => {
-  configPopup.classList.remove("show");
-  // Optional: Hide backdrop if implemented
-  // document.getElementById('popup-backdrop').classList.remove('show');
-});
-
-// --- Block Management (Ensure these work within the popup context) ---
-addTaskBtn.addEventListener("click", () => {
-  const description = taskDescInput.value.trim();
-  const duration = parseInt(taskDurationInput.value, 10);
-  const repetitions = parseInt(repetitionsInput.value, 10);
-
-  if (description && duration > 0 && repetitions > 0) {
-    addBlock("Task", duration * 60, description, repetitions);
-    taskDescInput.value = ""; // Clear input after adding
-    taskDurationInput.value = ""; // Clear input after adding
-    // Keep repetitions value
+  // --- 추가 ---
+  // Check if the electronAPI is exposed via preload script
+  if (
+    window.electronAPI &&
+    typeof window.electronAPI.openConfigWindow === "function"
+  ) {
+    window.electronAPI.openConfigWindow(); // Send message to main process
   } else {
-    alert("유효한 태스크 설명, 시간, 반복 횟수를 입력하세요."); // TODO: Use a more user-friendly notification
+    console.error(
+      "electronAPI.openConfigWindow is not available. Check preload.js."
+    );
+    alert("설정 창을 열 수 없습니다. preload 스크립트를 확인하세요."); // Provide user feedback
   }
 });
 
-addBreakBtn.addEventListener("click", () => {
-  const duration = parseInt(breakDurationInput.value, 10);
-  const repetitions = parseInt(repetitionsInput.value, 10);
-
-  if (duration > 0 && repetitions > 0) {
-    addBlock("Break", duration * 60, `휴식 (${duration}분)`, repetitions);
-    // Keep break duration and repetitions value
-  } else {
-    alert("유효한 휴식 시간과 반복 횟수를 입력하세요."); // TODO: Use a more user-friendly notification
-  }
-});
-
-// ... rest of the existing code (addBlock, updateSessionUI, startSession, etc.) ...
-
-// Initial UI update
-updateSessionUI();
+if (
+  window.electronAPI &&
+  typeof window.electronAPI.onConfigData === "function"
+) {
+  window.electronAPI.onConfigData((configData) => {
+    console.log("Received config data from main process:", configData);
+    // TODO: Process the received configData
+    // Example: Update sessionBlocks based on configData
+    // sessionBlocks = parseConfigData(configData); // You'll need a function to parse it
+    // renderSession(); // Update the main window UI
+    alert(
+      `설정 저장됨: 세션 ${configData.sessionDuration}분, 휴식 ${configData.breakDuration}분`
+    );
+  });
+} else {
+  console.error("electronAPI.onConfigData is not available. Check preload.js.");
+}
