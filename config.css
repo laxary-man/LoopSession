@@ -1,0 +1,245 @@
+/* config.css */
+body {
+  font-family: sans-serif;
+  padding: 20px;
+  background-color: #ffffff; /* Light mode default */
+  color: #000000; /* Light mode default */
+  box-sizing: border-box;
+}
+
+label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 0.9em;
+}
+
+input[type="number"],
+input[type="text"] {
+  width: 95%;
+  padding: 8px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 3px; /* Match main style */
+  box-sizing: border-box;
+}
+
+button {
+  padding: 8px 15px; /* Match main style */
+  margin-right: 10px;
+  border: none;
+  border-radius: 3px; /* Match main style */
+  cursor: pointer;
+  background-color: #e0e0e0; /* Light mode default */
+  color: #333;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.save-button {
+  background-color: #4caf50;
+  color: white;
+}
+
+.cancel-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.block-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 20px;
+  border: 1px solid #ccc;
+  border-radius: 5px; /* Match main style */
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: #f9f9f9; /* Light mode background */
+}
+
+.block-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #eee; /* Lighter border for light mode */
+}
+
+.block-item:last-child {
+  border-bottom: none;
+}
+
+.block-item span {
+  flex-grow: 1;
+  margin-right: 10px;
+}
+
+.block-item input[type="text"],
+.block-item input[type="number"] {
+  width: auto;
+  margin-bottom: 0;
+  padding: 4px;
+  display: none;
+  border-radius: 3px; /* Match main style */
+}
+
+.block-item .edit-controls,
+.block-item .view-controls {
+  display: flex;
+  gap: 5px;
+}
+
+.block-item .edit-controls {
+  display: none;
+}
+
+.block-item button {
+  padding: 5px 8px;
+  font-size: 0.9em;
+  margin-right: 0;
+}
+
+.delete-button {
+  background-color: #f44336;
+  color: white;
+}
+
+.edit-button {
+  background-color: #ff9800; /* Orange */
+  color: white;
+}
+
+.save-edit-button {
+  background-color: #4caf50; /* Green */
+  color: white;
+}
+
+.cancel-edit-button {
+  background-color: #757575; /* Grey */
+  color: white;
+}
+
+#add-block-form {
+  margin-top: 20px;
+  padding: 15px; /* Add padding */
+  border-top: 1px solid #ccc;
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+  background-color: #f9f9f9; /* Light mode background */
+  border-radius: 5px; /* Match main style */
+}
+
+#add-block-form div {
+  flex-grow: 1;
+}
+
+#add-block-form label {
+  margin-bottom: 3px;
+}
+
+#add-block-form input {
+  width: 95%; /* Adjust width */
+  margin-bottom: 0;
+  box-sizing: border-box;
+}
+
+#add-block-form button {
+  flex-shrink: 0;
+  height: 34px; /* Match input height (padding + border) */
+  background-color: #2196f3; /* Blue */
+  color: white;
+  margin-right: 0; /* Remove margin for last element */
+}
+
+/* --- Dark Mode Styles --- */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #1e1e1e; /* Dark background */
+    color: #f0f0f0; /* Light text */
+  }
+
+  input[type="number"],
+  input[type="text"] {
+    background-color: #333; /* Dark input background */
+    color: #f0f0f0; /* Light input text */
+    border-color: #555; /* Darker input border */
+  }
+
+  button {
+    background-color: #555; /* Darker button background */
+    color: #f0f0f0; /* Light button text */
+  }
+
+  button:hover {
+    background-color: #777; /* Lighter hover background */
+    opacity: 1; /* Reset opacity for dark mode hover */
+  }
+
+  .save-button {
+    background-color: #388e3c; /* Darker green */
+  }
+  .save-button:hover {
+    background-color: #4caf50; /* Lighter green on hover */
+  }
+
+  .cancel-button,
+  .delete-button {
+    background-color: #d32f2f; /* Darker red */
+  }
+  .cancel-button:hover,
+  .delete-button:hover {
+    background-color: #f44336; /* Lighter red on hover */
+  }
+
+  .block-list {
+    background-color: #2a2a2a; /* Dark container background */
+    border-color: #444; /* Darker border */
+  }
+
+  .block-item {
+    background-color: #333; /* Dark block background */
+    border-bottom-color: #555; /* Darker block border */
+  }
+
+  .block-item input[type="text"],
+  .block-item input[type="number"] {
+    background-color: #444; /* Slightly lighter dark input */
+    color: #f0f0f0;
+    border-color: #666;
+  }
+
+  .edit-button {
+    background-color: #f57c00; /* Darker orange */
+  }
+  .edit-button:hover {
+    background-color: #ff9800; /* Lighter orange on hover */
+  }
+
+  .save-edit-button {
+    background-color: #388e3c; /* Darker green */
+  }
+  .save-edit-button:hover {
+    background-color: #4caf50; /* Lighter green on hover */
+  }
+
+  .cancel-edit-button {
+    background-color: #616161; /* Darker grey */
+  }
+  .cancel-edit-button:hover {
+    background-color: #757575; /* Lighter grey on hover */
+  }
+
+  #add-block-form {
+    background-color: #2a2a2a; /* Dark container background */
+    border-top-color: #444; /* Darker border */
+  }
+
+  #add-block-form button {
+    background-color: #1976d2; /* Darker blue */
+  }
+  #add-block-form button:hover {
+    background-color: #2196f3; /* Lighter blue on hover */
+  }
+}
