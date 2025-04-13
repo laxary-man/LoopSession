@@ -12,50 +12,32 @@
     <!-- Link the new CSS file -->
   </head>
   <body>
-    <h1>세션 구성</h1>
-
     <form id="config-form">
-      <div>
-        <label for="session-duration">기본 집중 시간 (분):</label>
-        <input
-          type="number"
-          id="session-duration"
-          name="sessionDuration"
-          value="25"
-          min="1"
-        />
-      </div>
-      <div>
-        <label for="break-duration">기본 휴식 시간 (분):</label>
-        <input
-          type="number"
-          id="break-duration"
-          name="breakDuration"
-          value="5"
-          min="1"
-        />
-      </div>
-
       <h2>세션 블록</h2>
       <ul id="block-list" class="block-list">
         <!-- Block items will be added here by JavaScript -->
       </ul>
 
-      <div id="add-block-form">
+      <div id="add-block-form" style="margin-top: 15px">
+        <!-- Added margin-top -->
         <div>
           <label for="block-name">태스크 이름:</label>
           <input type="text" id="block-name" placeholder="예: 코딩" />
         </div>
-        <div>
+        <div style="margin-top: 10px">
+          <!-- Added margin-top -->
           <label for="block-duration">시간 (분):</label>
           <input type="number" id="block-duration" value="25" min="1" />
         </div>
-        <button type="button" id="add-block-button">블록 추가</button>
+        <button type="button" id="add-block-button" style="margin-top: 10px">
+          블록 추가
+        </button>
+        <!-- Added margin-top -->
       </div>
 
       <!-- TODO: Add more configuration options as needed -->
 
-      <div style="margin-top: 20px">
+      <div style="margin-top: 50px">
         <!-- Add margin for spacing -->
         <button type="submit" class="save-button">저장</button>
         <button type="button" id="cancel-button" class="cancel-button">

@@ -2,8 +2,6 @@
 if (window.electronAPI) {
   const configForm = document.getElementById("config-form");
   const cancelButton = document.getElementById("cancel-button");
-  const sessionDurationInput = document.getElementById("session-duration");
-  const breakDurationInput = document.getElementById("break-duration");
 
   const blockListElement = document.getElementById("block-list");
   const addBlockButton = document.getElementById("add-block-button");
@@ -147,24 +145,8 @@ if (window.electronAPI) {
   configForm.addEventListener("submit", (event) => {
     event.preventDefault(); // Prevent default form submission
 
-    const sessionDuration = parseInt(sessionDurationInput.value, 10);
-    const breakDuration = parseInt(breakDurationInput.value, 10);
-
     // TODO: Add input validation for session/break durations before sending
-    if (
-      isNaN(sessionDuration) ||
-      sessionDuration <= 0 ||
-      isNaN(breakDuration) ||
-      breakDuration <= 0
-    ) {
-      console.error("Invalid session or break duration.");
-      // TODO: Display error message to the user using a dedicated UI element instead of console.error.
-      return; // Prevent sending invalid data
-    }
-
     const configData = {
-      sessionDuration: sessionDuration,
-      breakDuration: breakDuration,
       blocks: currentBlocks, // Include the current blocks
       // TODO: Retrieve other config values if added
     };
@@ -186,9 +168,9 @@ if (window.electronAPI) {
     // TODO: Validate received initialConfigData structure rigorously (e.g., using a schema validation library).
     // TODO: Consider privacy implications if block names contain sensitive info - potentially sanitize or anonymize.
     if (initialConfigData) {
-      // Populate form fields
-      sessionDurationInput.value = initialConfigData.sessionDuration || 25; // Use default if missing
-      breakDurationInput.value = initialConfigData.breakDuration || 5; // Use default if missing
+      // Populate form fields - Remove references to non-existent elements
+      // sessionDurationInput.value = initialConfigData.sessionDuration || 25; // Use default if missing
+      // breakDurationInput.value = initialConfigData.breakDuration || 5; // Use default if missing
 
       // Populate blocks
       currentBlocks =
@@ -235,8 +217,6 @@ if (window.electronAPI) {
       nextBlockId = maxId + 1; // Set next ID correctly
     } else {
       // Handle case where no initial data is received (e.g., first run)
-      sessionDurationInput.value = 25; // Default
-      breakDurationInput.value = 5; // Default
       currentBlocks = [];
       nextBlockId = 0;
     }
