@@ -11,13 +11,13 @@ function createWindow() {
     height: 600,
     resizable: false, // Prevent resizing
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"),
+      preload: path.join(__dirname, "Scripts/preload.js"), // Updated path
       contextIsolation: true,
       nodeIntegration: false,
     },
   });
 
-  mainWindow.loadFile("index.html");
+  mainWindow.loadFile(path.join(__dirname, "Html/index.html")); // Updated path
   // mainWindow.webContents.openDevTools(); // Optional: Open DevTools for main window
 
   // Clean up config window reference if main window is closed
@@ -45,7 +45,7 @@ function createConfigWindow() {
     modal: true, // Make it modal (optional, blocks interaction with parent)
     resizable: false, // Prevent resizing
     webPreferences: {
-      preload: path.join(__dirname, "preload.js"), // Reuse the same preload script
+      preload: path.join(__dirname, "Scripts/preload.js"), // Updated path
       contextIsolation: true,
       nodeIntegration: false,
     },
@@ -53,7 +53,7 @@ function createConfigWindow() {
     autoHideMenuBar: true, // Hide menu bar
   });
 
-  configWindow.loadFile(path.join(__dirname, "config.html")); // Load the new HTML file
+  configWindow.loadFile(path.join(__dirname, "Html/config.html")); // Updated path
 
   configWindow.once("ready-to-show", () => {
     configWindow.show();
