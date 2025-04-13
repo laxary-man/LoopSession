@@ -5,6 +5,7 @@ if (window.electronAPI) {
 
   const blockListElement = document.getElementById("block-list");
   const addBlockButton = document.getElementById("add-block-button");
+  const addBreakButton = document.getElementById("add-break-button"); // Added for break button
   const blockNameInput = document.getElementById("block-name");
   const blockDurationInput = document.getElementById("block-duration");
 
@@ -17,11 +18,18 @@ if (window.electronAPI) {
     currentBlocks.forEach((block) => {
       const li = document.createElement("li");
       li.classList.add("block-item");
+      // Add a class if it's a break block for potential styling
+      if (block.isBreak) {
+        li.classList.add("break-block");
+      }
       li.dataset.id = block.id; // Store ID on the element
 
       // View elements
       const viewSpan = document.createElement("span");
-      viewSpan.textContent = `${block.name} (${block.duration}분)`;
+      // Display '휴식' if it's a break block
+      viewSpan.textContent = block.isBreak
+        ? `휴식 (${block.duration}분)`
+        : `${block.name} (${block.duration}분)`;
       const viewControls = document.createElement("div");
       viewControls.classList.add("view-controls");
       const editButton = document.createElement("button");
@@ -38,6 +46,11 @@ if (window.electronAPI) {
       editNameInput.type = "text";
       editNameInput.value = block.name;
       editNameInput.classList.add("edit-name-input");
+      // Disable name editing for break blocks
+      if (block.isBreak) {
+        editNameInput.disabled = true;
+        editNameInput.style.display = "none"; // Hide name input for breaks in edit mode too
+      }
       const editDurationInput = document.createElement("input");
       editDurationInput.type = "number";
       editDurationInput.value = block.duration;
@@ -56,7 +69,10 @@ if (window.electronAPI) {
 
       // Assemble list item
       li.appendChild(viewSpan);
-      li.appendChild(editNameInput); // Add edit inputs (hidden)
+      // Only add name input if not a break block
+      if (!block.isBreak) {
+        li.appendChild(editNameInput);
+      }
       li.appendChild(editDurationInput);
       li.appendChild(viewControls);
       li.appendChild(editControls); // Add edit controls (hidden)
@@ -73,10 +89,18 @@ if (window.electronAPI) {
         li.classList.add("editing");
         viewSpan.style.display = "none";
         viewControls.style.display = "none";
-        editNameInput.style.display = "inline-block";
+        // Only show name input if not a break block
+        if (!block.isBreak) {
+          editNameInput.style.display = "inline-block";
+        }
         editDurationInput.style.display = "inline-block";
         editControls.style.display = "flex";
-        editNameInput.focus(); // Focus the name input
+        // Focus duration input for breaks, name input otherwise
+        if (block.isBreak) {
+          editDurationInput.focus();
+        } else {
+          editNameInput.focus();
+        }
       });
 
       cancelEditButton.addEventListener("click", () => {
@@ -84,24 +108,35 @@ if (window.electronAPI) {
         li.classList.remove("editing");
         viewSpan.style.display = "inline-block"; // Or flex/block depending on layout needs
         viewControls.style.display = "flex";
-        editNameInput.style.display = "none";
+        if (!block.isBreak) {
+          editNameInput.style.display = "none";
+        }
         editDurationInput.style.display = "none";
         editControls.style.display = "none";
         // Reset input values to original block data
-        editNameInput.value = block.name;
+        if (!block.isBreak) {
+          editNameInput.value = block.name;
+        }
         editDurationInput.value = block.duration;
       });
 
       saveEditButton.addEventListener("click", () => {
-        const newName = editNameInput.value.trim();
+        // For breaks, only update duration. For regular blocks, update name and duration.
         const newDuration = parseInt(editDurationInput.value, 10);
+        let newName = block.name; // Keep original name by default
 
-        // TODO: Implement robust validation chain for name and duration
-        if (newName && newDuration > 0) {
+        if (!block.isBreak) {
+          newName = editNameInput.value.trim();
+        }
+
+        // TODO: Implement robust validation chain for name (if applicable) and duration
+        if ((block.isBreak || newName) && newDuration > 0) {
           // Find the block in the array and update it
           const blockIndex = currentBlocks.findIndex((b) => b.id === block.id);
           if (blockIndex > -1) {
-            currentBlocks[blockIndex].name = newName;
+            if (!block.isBreak) {
+              currentBlocks[blockIndex].name = newName;
+            }
             currentBlocks[blockIndex].duration = newDuration;
           }
           renderBlockList(); // Re-render to show updated view and exit edit mode
@@ -129,7 +164,8 @@ if (window.electronAPI) {
 
     // TODO: Implement robust validation chain for name and duration
     if (name && duration > 0) {
-      currentBlocks.push({ id: nextBlockId++, name, duration });
+      // Add isBreak: false for regular blocks
+      currentBlocks.push({ id: nextBlockId++, name, duration, isBreak: false });
       renderBlockList(); // Update the list display
       // Clear input fields
       blockNameInput.value = "";
@@ -139,6 +175,23 @@ if (window.electronAPI) {
       // TODO: Provide user feedback (e.g., highlight fields, display message)
       console.error("Please enter a valid name and duration > 0.");
     }
+  });
+
+  // Add new break block
+  addBreakButton.addEventListener("click", () => {
+    // TODO: Consider making the default break duration configurable
+    const breakDuration = 5; // Default break duration
+    currentBlocks.push({
+      id: nextBlockId++,
+      name: "휴식",
+      duration: breakDuration,
+      isBreak: true,
+    });
+    renderBlockList();
+    // Optionally clear or reset the main input fields as well
+    blockNameInput.value = "";
+    blockDurationInput.value = "25";
+    blockNameInput.focus(); // Keep focus on name input
   });
 
   // Save configuration
@@ -175,7 +228,10 @@ if (window.electronAPI) {
       // Populate blocks
       currentBlocks =
         initialConfigData.blocks && Array.isArray(initialConfigData.blocks)
-          ? initialConfigData.blocks
+          ? initialConfigData.blocks.map((b) => ({
+              ...b,
+              isBreak: b.isBreak || false,
+            })) // Ensure isBreak exists
           : [];
 
       // Ensure blocks have unique IDs and valid structure (reuse existing validation logic)
@@ -198,9 +254,13 @@ if (window.electronAPI) {
           b.id = undefined; // Mark for assignment
         }
         // TODO: Implement stricter validation for block name (e.g., length limits, allowed characters) and duration (e.g., reasonable range).
-        if (typeof b.name !== "string" || b.name.trim() === "")
-          b.name = "Unnamed Block";
-        if (typeof b.duration !== "number" || b.duration <= 0) b.duration = 25; // Default duration
+        // Ensure name exists even for breaks, though it might not be editable
+        if (typeof b.name !== "string" || (!b.isBreak && b.name.trim() === ""))
+          b.name = b.isBreak ? "휴식" : "Unnamed Block";
+        if (typeof b.duration !== "number" || b.duration <= 0)
+          b.duration = b.isBreak ? 5 : 25; // Default duration based on type
+        // Ensure isBreak is a boolean
+        b.isBreak = !!b.isBreak;
       });
 
       // Assign new IDs where needed
