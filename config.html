@@ -39,6 +39,91 @@
         background-color: #f44336;
         color: white;
       }
+      .block-list {
+        list-style: none;
+        padding: 0;
+        margin-top: 20px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        max-height: 200px; /* Limit height and make scrollable */
+        overflow-y: auto;
+      }
+      .block-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #ccc;
+      }
+      .block-item:last-child {
+        border-bottom: none;
+      }
+      .block-item span {
+        flex-grow: 1;
+        margin-right: 10px;
+      }
+      .block-item input[type="text"],
+      .block-item input[type="number"] {
+        width: auto; /* Adjust width for inline editing */
+        margin-bottom: 0;
+        padding: 4px;
+        display: none; /* Hide inputs initially */
+      }
+      .block-item .edit-controls,
+      .block-item .view-controls {
+        display: flex;
+        gap: 5px; /* Add space between buttons */
+      }
+      .block-item .edit-controls {
+        display: none; /* Hide save/cancel initially */
+      }
+      .block-item button {
+        padding: 5px 8px;
+        font-size: 0.9em;
+        margin-right: 0; /* Remove default margin */
+      }
+      .delete-button {
+        background-color: #f44336;
+        color: white;
+      }
+      .edit-button {
+        background-color: #ff9800; /* Orange */
+        color: white;
+      }
+      .save-edit-button {
+        background-color: #4caf50; /* Green */
+        color: white;
+      }
+      .cancel-edit-button {
+        background-color: #757575; /* Grey */
+        color: white;
+      }
+
+      #add-block-form {
+        margin-top: 20px;
+        padding-top: 15px;
+        border-top: 1px solid #ccc;
+        display: flex;
+        gap: 10px; /* Space out elements */
+        align-items: flex-end; /* Align items nicely */
+      }
+      #add-block-form div {
+        flex-grow: 1; /* Allow inputs to take space */
+      }
+      #add-block-form label {
+        margin-bottom: 3px;
+        font-size: 0.9em;
+      }
+      #add-block-form input {
+        width: 90%; /* Adjust width within flex item */
+        margin-bottom: 0;
+      }
+      #add-block-form button {
+        flex-shrink: 0; /* Prevent button from shrinking */
+        height: 34px; /* Match input height */
+        background-color: #2196f3; /* Blue */
+        color: white;
+      }
 
       /* Dark Mode Styles */
       @media (prefers-color-scheme: dark) {
@@ -58,6 +143,36 @@
         .cancel-button {
           background-color: #d32f2f; /* Darker red */
         }
+        .block-list {
+          border-color: #777;
+        }
+        .block-item {
+          border-bottom-color: #777;
+        }
+        .block-item input[type="text"],
+        .block-item input[type="number"] {
+          background-color: #666;
+          color: #eee;
+          border-color: #888;
+        }
+        #add-block-form {
+          border-top-color: #777;
+        }
+        .delete-button {
+          background-color: #d32f2f; /* Darker red */
+        }
+        .edit-button {
+          background-color: #f57c00; /* Darker orange */
+        }
+        .save-edit-button {
+          background-color: #388e3c; /* Darker green */
+        }
+        .cancel-edit-button {
+          background-color: #616161; /* Darker grey */
+        }
+        #add-block-form button {
+          background-color: #1976d2; /* Darker blue */
+        }
       }
     </style>
   </head>
@@ -66,7 +181,7 @@
 
     <form id="config-form">
       <div>
-        <label for="session-duration">세션 시간 (분):</label>
+        <label for="session-duration">기본 집중 시간 (분):</label>
         <input
           type="number"
           id="session-duration"
@@ -76,7 +191,7 @@
         />
       </div>
       <div>
-        <label for="break-duration">휴식 시간 (분):</label>
+        <label for="break-duration">기본 휴식 시간 (분):</label>
         <input
           type="number"
           id="break-duration"
@@ -85,48 +200,35 @@
           min="1"
         />
       </div>
+
+      <h2>세션 블록</h2>
+      <ul id="block-list" class="block-list">
+        <!-- Block items will be added here by JavaScript -->
+      </ul>
+
+      <div id="add-block-form">
+        <div>
+          <label for="block-name">태스크 이름:</label>
+          <input type="text" id="block-name" placeholder="예: 코딩" />
+        </div>
+        <div>
+          <label for="block-duration">시간 (분):</label>
+          <input type="number" id="block-duration" value="25" min="1" />
+        </div>
+        <button type="button" id="add-block-button">블록 추가</button>
+      </div>
+
       <!-- TODO: Add more configuration options as needed -->
 
-      <button type="submit" class="save-button">저장</button>
-      <button type="button" id="cancel-button" class="cancel-button">
-        취소
-      </button>
+      <div style="margin-top: 20px">
+        <!-- Add margin for spacing -->
+        <button type="submit" class="save-button">저장</button>
+        <button type="button" id="cancel-button" class="cancel-button">
+          취소
+        </button>
+      </div>
     </form>
 
-    <script>
-      // Ensure the preload script has exposed the API
-      if (window.electronAPI) {
-        const form = document.getElementById("config-form");
-        const cancelButton = document.getElementById("cancel-button");
-
-        form.addEventListener("submit", (event) => {
-          event.preventDefault(); // Prevent default form submission
-          const formData = new FormData(form);
-          const configData = {
-            sessionDuration: parseInt(formData.get("sessionDuration"), 10),
-            breakDuration: parseInt(formData.get("breakDuration"), 10),
-            // TODO: Retrieve other config values
-          };
-          // TODO: Add input validation before sending
-          window.electronAPI.sendConfigData(configData); // Use exposed API
-        });
-
-        cancelButton.addEventListener("click", () => {
-          window.electronAPI.closeConfigWindow(); // Use exposed API
-        });
-      } else {
-        console.error(
-          "electronAPI is not available. Check preload.js and contextIsolation settings."
-        );
-        // Optionally, display an error message to the user in the config window itself
-        const body = document.querySelector("body");
-        const errorDiv = document.createElement("div");
-        errorDiv.textContent =
-          "오류: 설정을 저장하거나 창을 닫을 수 없습니다. preload 스크립트를 확인하세요.";
-        errorDiv.style.color = "red";
-        errorDiv.style.marginTop = "20px";
-        body.appendChild(errorDiv);
-      }
-    </script>
+    <script src="config.js" defer></script>
   </body>
 </html>
