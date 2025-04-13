@@ -1,7 +1,11 @@
 const sessionContainer = document.getElementById("session-container");
-const taskDescInput = document.getElementById("task-desc");
-const taskDurationInput = document.getElementById("task-duration");
-const breakDurationInput = document.getElementById("break-duration");
+// --- 주석 처리 또는 삭제 ---
+// const taskDescInput = document.getElementById("task-desc");
+// const taskDurationInput = document.getElementById("task-duration");
+// const breakDurationInput = document.getElementById("break-duration");
+// const addTaskBtn = document.getElementById("add-task-btn"); // Assuming this ID exists
+// const addBreakBtn = document.getElementById("add-break-btn"); // Assuming this ID exists
+// --- ---
 const startSessionBtn = document.getElementById("start-session-btn");
 const pauseSessionBtn = document.getElementById("pause-session-btn");
 const resetSessionBtn = document.getElementById("reset-session-btn");
@@ -18,104 +22,77 @@ let remainingTime = 0; // in seconds
 let isPaused = false;
 let currentRepetition = 1;
 let totalRepetitions = 1;
+let configBreakDuration = 5 * 60; // Default break duration in seconds, updated from config
 
-// --- Block Management ---
+// --- Block Management (Now primarily driven by config) ---
 
+// --- 주석 처리 또는 삭제 ---
+/*
 function addBlock(type) {
-  const block = { type };
-  let durationMinutes;
-
-  if (type === "task") {
-    const description =
-      taskDescInput.value.trim() ||
-      `Task ${sessionBlocks.filter((b) => b.type === "task").length + 1}`;
-    durationMinutes = parseInt(taskDurationInput.value, 10);
-    if (isNaN(durationMinutes) || durationMinutes <= 0) {
-      alert("유효한 Task 시간을 입력하세요.");
-      return;
-    }
-    block.description = description;
-    taskDescInput.value = ""; // Clear input
-    taskDurationInput.value = ""; // Clear input
-  } else {
-    // break
-    durationMinutes = parseInt(breakDurationInput.value, 10);
-    if (isNaN(durationMinutes) || durationMinutes <= 0) {
-      alert("유효한 Break 시간을 입력하세요.");
-      return;
-    }
-    block.description = `Break`;
-  }
-
-  block.duration = durationMinutes * 60; // Store duration in seconds
-  sessionBlocks.push(block);
-  renderSession();
+  // ... (original addBlock logic) ...
 }
 
 function removeBlock(index) {
   sessionBlocks.splice(index, 1);
   renderSession();
 }
+*/
+// --- ---
 
-// TODO: Implement moveBlockUp(index) and moveBlockDown(index) for reordering
-// TODO: Implement drag and drop reordering
+// TODO: Implement moveBlockUp(index) and moveBlockDown(index) for reordering (if needed in main view)
+// TODO: Implement drag and drop reordering (if needed in main view)
 
 function renderSession() {
   // Clear current view
   sessionContainer.innerHTML = "";
 
   if (sessionBlocks.length === 0) {
-    sessionContainer.innerHTML =
-      "<p>세션을 구성하세요. Task 또는 Break 블록을 추가할 수 있습니다.</p>";
+    sessionContainer.innerHTML = "<p>세션을 구성하려면 설정(⚙️)을 여세요.</p>"; // Updated message
     startSessionBtn.disabled = true;
     return;
   }
 
   sessionBlocks.forEach((block, index) => {
     const blockElement = document.createElement("div");
-    blockElement.classList.add("block", block.type);
-    // TODO: Add draggable attribute and event listeners for drag/drop
+    // Use block.name as description, assume all are 'task' type for now
+    // TODO: Adapt if config.js adds a 'type' field to blocks.
+    blockElement.classList.add("block", "task"); // Assuming all blocks from config are tasks
+    // TODO: Add draggable attribute and event listeners for drag/drop if reordering in main view is desired
 
     const descriptionSpan = document.createElement("span");
+    // Display name and duration in minutes
     descriptionSpan.textContent = `${block.description} (${Math.floor(
       block.duration / 60
     )}분)`;
 
+    // --- 주석 처리 또는 삭제 (Remove button) ---
+    /*
     const controlsDiv = document.createElement("div");
     controlsDiv.classList.add("block-controls");
-
-    // TODO: Add Up/Down buttons if not using drag/drop
     const removeBtn = document.createElement("button");
     removeBtn.textContent = "삭제";
-    removeBtn.onclick = () => removeBlock(index);
-
+    // removeBtn.onclick = () => removeBlock(index); // removeBlock is removed/commented
     controlsDiv.appendChild(removeBtn);
+    */
+    // --- ---
+
     blockElement.appendChild(descriptionSpan);
-    blockElement.appendChild(controlsDiv);
+    // blockElement.appendChild(controlsDiv); // Removed controls
     sessionContainer.appendChild(blockElement);
   });
 
-  // Enable start button only if valid session (at least 1 task, ends with break)
-  const hasTask = sessionBlocks.some((b) => b.type === "task");
-  const endsWithBreak =
-    sessionBlocks.length > 0 &&
-    sessionBlocks[sessionBlocks.length - 1].type === "break";
-  startSessionBtn.disabled = !(hasTask && endsWithBreak);
+  // Enable start button if there are blocks
+  startSessionBtn.disabled = sessionBlocks.length === 0;
 }
 
 // --- Timer Logic ---
 
 function startSession() {
   if (sessionBlocks.length === 0) return;
-  // Validate session structure (redundant check, but good practice)
-  const hasTask = sessionBlocks.some((b) => b.type === "task");
-  const endsWithBreak =
-    sessionBlocks.length > 0 &&
-    sessionBlocks[sessionBlocks.length - 1].type === "break";
-  if (!hasTask || !endsWithBreak) {
-    alert("세션은 최소 1개의 Task를 포함하고 Break로 끝나야 합니다.");
-    return;
-  }
+
+  // TODO: Re-evaluate session validation logic based on config structure.
+  // The old validation (task + ends with break) might not apply directly.
+  // For now, allow starting if there's at least one block.
 
   totalRepetitions = parseInt(repetitionsInput.value, 10) || 1;
   currentRepetition = 1;
@@ -127,22 +104,24 @@ function startSession() {
   startSessionBtn.disabled = true;
   pauseSessionBtn.disabled = false;
   resetSessionBtn.disabled = false;
-  disableEditing(true);
+  disableEditing(true); // Disable repetitions input during session
   // TODO: Show progress bar
 }
 
 function startBlock(index) {
   if (index >= sessionBlocks.length) {
-    sessionFinished();
+    // Finished all blocks in the current repetition
+    // TODO: Decide if a break (using configBreakDuration) should happen *between* repetitions.
+    // For now, just move to the next repetition or finish.
+    handleRepetitionEnd();
     return;
   }
 
   const block = sessionBlocks[index];
-  remainingTime = block.duration;
+  remainingTime = block.duration; // Duration is already in seconds
   updateTimerDisplay();
   highlightCurrentBlock(index);
-  currentBlockTypeSpan.textContent =
-    block.type === "task" ? block.description : "Break";
+  currentBlockTypeSpan.textContent = block.description; // Use block name
 
   clearInterval(timerInterval); // Clear any existing interval
   timerInterval = setInterval(() => {
@@ -150,39 +129,41 @@ function startBlock(index) {
 
     remainingTime--;
     updateTimerDisplay();
+    // TODO: Update progress bar based on remainingTime / block.duration
 
     if (remainingTime <= 0) {
       clearInterval(timerInterval);
-      // TODO: Play notification sound/show popup
+      // TODO: Play notification sound/show popup using a more user-friendly method than alert.
       // alert(`${block.description} 완료!`); // Simple alert for now
       moveToNextBlock();
     }
   }, 1000);
 }
 
+function handleRepetitionEnd() {
+  if (currentRepetition < totalRepetitions) {
+    currentRepetition++;
+    currentBlockIndex = 0;
+    // TODO: Optionally insert a break period here using configBreakDuration before starting the next repetition.
+    console.log(`Starting repetition ${currentRepetition}/${totalRepetitions}`); // Debug log
+    startBlock(currentBlockIndex); // Start next repetition
+  } else {
+    sessionFinished(); // All repetitions done
+  }
+}
+
 function moveToNextBlock() {
   highlightCurrentBlock(-1); // Remove highlight from finished block
   currentBlockIndex++;
-  if (currentBlockIndex < sessionBlocks.length) {
-    startBlock(currentBlockIndex);
-  } else {
-    // Current repetition finished
-    if (currentRepetition < totalRepetitions) {
-      currentRepetition++;
-      currentBlockIndex = 0;
-      // TODO: Maybe add a short pause between repetitions?
-      startBlock(currentBlockIndex);
-    } else {
-      sessionFinished();
-    }
-  }
+  startBlock(currentBlockIndex); // Will handle index >= length case
 }
 
 function sessionFinished() {
   clearInterval(timerInterval);
+  // TODO: Use a less intrusive notification method.
   alert("세션 완료!");
   resetSession();
-  // TODO: Record statistics
+  // TODO: Record statistics (e.g., total time, blocks completed).
 }
 
 function pauseSession() {
@@ -202,15 +183,11 @@ function resetSession() {
   highlightCurrentBlock(-1); // Clear highlight
 
   // Update UI state
-  startSessionBtn.disabled = !(
-    sessionBlocks.some((b) => b.type === "task") &&
-    sessionBlocks.length > 0 &&
-    sessionBlocks[sessionBlocks.length - 1].type === "break"
-  );
+  startSessionBtn.disabled = sessionBlocks.length === 0; // Enable if blocks exist
   pauseSessionBtn.disabled = true;
   pauseSessionBtn.textContent = "일시정지";
   resetSessionBtn.disabled = true;
-  disableEditing(false);
+  disableEditing(false); // Enable repetitions input
   // TODO: Hide/reset progress bar
 }
 
@@ -237,20 +214,26 @@ function highlightCurrentBlock(index) {
 }
 
 function disableEditing(disabled) {
-  const addTaskBtn = document.getElementById("add-task-btn");
-  const addBreakBtn = document.getElementById("add-break-btn");
-  addTaskBtn.disabled = disabled;
-  addBreakBtn.disabled = disabled;
-  taskDescInput.disabled = disabled;
-  taskDurationInput.disabled = disabled;
-  breakDurationInput.disabled = disabled;
-  repetitionsInput.disabled = disabled;
+  // --- 주석 처리 또는 삭제 ---
+  // const addTaskBtn = document.getElementById("add-task-btn");
+  // const addBreakBtn = document.getElementById("add-break-btn");
+  // addTaskBtn.disabled = disabled;
+  // addBreakBtn.disabled = disabled;
+  // taskDescInput.disabled = disabled;
+  // taskDurationInput.disabled = disabled;
+  // breakDurationInput.disabled = disabled;
+  // --- ---
+  repetitionsInput.disabled = disabled; // Only disable repetitions input
 
+  // --- 주석 처리 또는 삭제 (Remove buttons) ---
+  /*
   const removeButtons = sessionContainer.querySelectorAll(
     ".block-controls button"
   );
   removeButtons.forEach((btn) => (btn.disabled = disabled));
-  // TODO: Disable drag/drop if implemented
+  */
+  // --- ---
+  // TODO: Disable drag/drop if implemented and editing is disabled
 }
 
 // --- Event Listeners ---
@@ -273,20 +256,48 @@ openConfigBtn.addEventListener("click", () => {
   }
 });
 
+// Listen for config data updates from the main process
 if (
   window.electronAPI &&
   typeof window.electronAPI.onConfigData === "function"
 ) {
   window.electronAPI.onConfigData((configData) => {
-    console.log("Received config data from main process:", configData);
-    // TODO: Process the received configData
-    // Example: Update sessionBlocks based on configData
-    // sessionBlocks = parseConfigData(configData); // You'll need a function to parse it
-    // renderSession(); // Update the main window UI
-    alert(
-      `설정 저장됨: 세션 ${configData.sessionDuration}분, 휴식 ${configData.breakDuration}분`
-    );
+    console.log("Received config data from main process:", configData); // Debug log
+
+    // TODO: Add validation for the received configData structure.
+    if (!configData || !Array.isArray(configData.blocks)) {
+      console.error("Invalid config data received:", configData);
+      // TODO: Show an error message to the user.
+      return;
+    }
+
+    // Update break duration (convert minutes to seconds)
+    configBreakDuration = (configData.breakDuration || 5) * 60;
+
+    // Transform blocks from config format to timer format
+    // Assuming all blocks from config are 'task' type for now.
+    // TODO: Adapt this transformation if config.js adds a 'type' field to blocks.
+    sessionBlocks = configData.blocks.map((block) => ({
+      // TODO: Define a clear mapping between config block properties and timer block properties.
+      type: "task", // Hardcoded assumption
+      description: block.name,
+      duration: block.duration * 60, // Convert minutes to seconds
+    }));
+
+    console.log("Transformed session blocks:", sessionBlocks); // Debug log
+
+    // Update the UI and reset the timer state
+    renderSession();
+    resetSession();
+
+    // Optional: Provide user feedback that settings were updated.
+    // alert("세션 구성이 업데이트되었습니다."); // Can be annoying, consider a less intrusive notification.
   });
 } else {
   console.error("electronAPI.onConfigData is not available. Check preload.js.");
+  // TODO: Display a persistent error message in the UI if the API is unavailable.
 }
+
+// Initial render on load (might be empty until config is opened/saved)
+renderSession();
+resetSession(); // Ensure initial state is correct

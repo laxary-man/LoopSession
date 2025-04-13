@@ -8,9 +8,11 @@ contextBridge.exposeInMainWorld("electronAPI", {
   onConfigData: (callback) =>
     ipcRenderer.on("config-data", (_event, value) => callback(value)),
 
-  // Config window <- Main process: Receive initial block data
-  onInitialBlocksData: (callback) =>
-    ipcRenderer.on("initial-blocks-data", (_event, value) => callback(value)),
+  // Config window <- Main process: Receive initial config data (renamed)
+  onInitialConfigData: (
+    callback // Renamed from onInitialBlocksData
+  ) =>
+    ipcRenderer.on("initial-config-data", (_event, value) => callback(value)),
 
   // Config window -> Main process: Send config data to save
   sendConfigData: (data) => ipcRenderer.send("save-config-data", data),

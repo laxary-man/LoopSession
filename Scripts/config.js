@@ -158,7 +158,7 @@ if (window.electronAPI) {
       breakDuration <= 0
     ) {
       console.error("Invalid session or break duration.");
-      // TODO: Display error message to the user
+      // TODO: Display error message to the user using a dedicated UI element instead of console.error.
       return; // Prevent sending invalid data
     }
 
@@ -170,6 +170,7 @@ if (window.electronAPI) {
     };
 
     console.log("Sending config data:", configData); // Debug log
+    // TODO: Consider adding data validation before sending using window.electronAPI.sendConfigData.
     window.electronAPI.sendConfigData(configData); // Use exposed API
   });
 
@@ -178,49 +179,69 @@ if (window.electronAPI) {
     window.electronAPI.closeConfigWindow(); // Use exposed API
   });
 
-  // Listen for initial block data from main process
-  window.electronAPI.onInitialBlocksData((blocks) => {
-    console.log("Received initial blocks:", blocks); // Debug log
-    // TODO: Validate received blocks structure rigorously (schema validation?)
-    // TODO: Consider privacy implications if block names contain sensitive info.
-    currentBlocks = blocks && Array.isArray(blocks) ? blocks : [];
-    // Ensure blocks have unique IDs if they don't already
-    let maxId = -1;
-    const existingIds = new Set();
-    currentBlocks.forEach((b) => {
-      if (typeof b.id === "number" && !isNaN(b.id)) {
-        if (existingIds.has(b.id)) {
-          console.warn(`Duplicate block ID ${b.id} found. Assigning a new ID.`);
-          // TODO: Decide on a strategy for handling duplicate IDs (re-assign, error?)
-          b.id = undefined; // Mark for reassignment
+  // Listen for initial config data from main process (renamed)
+  window.electronAPI.onInitialConfigData((initialConfigData) => {
+    console.log("Received initial config:", initialConfigData); // Debug log
+
+    // TODO: Validate received initialConfigData structure rigorously (e.g., using a schema validation library).
+    // TODO: Consider privacy implications if block names contain sensitive info - potentially sanitize or anonymize.
+    if (initialConfigData) {
+      // Populate form fields
+      sessionDurationInput.value = initialConfigData.sessionDuration || 25; // Use default if missing
+      breakDurationInput.value = initialConfigData.breakDuration || 5; // Use default if missing
+
+      // Populate blocks
+      currentBlocks =
+        initialConfigData.blocks && Array.isArray(initialConfigData.blocks)
+          ? initialConfigData.blocks
+          : [];
+
+      // Ensure blocks have unique IDs and valid structure (reuse existing validation logic)
+      let maxId = -1;
+      const existingIds = new Set();
+      currentBlocks.forEach((b) => {
+        // TODO: Refactor ID assignment and validation into a reusable function.
+        if (typeof b.id === "number" && !isNaN(b.id)) {
+          if (existingIds.has(b.id)) {
+            console.warn(
+              `Duplicate block ID ${b.id} found. Assigning a new ID.`
+            );
+            // TODO: Decide on a strategy for handling duplicate IDs (re-assign, error?) - Re-assigning for now.
+            b.id = undefined; // Mark for reassignment
+          } else {
+            existingIds.add(b.id);
+            maxId = Math.max(maxId, b.id);
+          }
         } else {
-          existingIds.add(b.id);
-          maxId = Math.max(maxId, b.id);
+          b.id = undefined; // Mark for assignment
         }
-      } else {
-        b.id = undefined; // Mark for assignment
-      }
-      // TODO: Validate block name and duration types/values
-      if (typeof b.name !== "string") b.name = "Unnamed Block";
-      if (typeof b.duration !== "number" || b.duration <= 0) b.duration = 25; // Default duration
-    });
+        // TODO: Implement stricter validation for block name (e.g., length limits, allowed characters) and duration (e.g., reasonable range).
+        if (typeof b.name !== "string" || b.name.trim() === "")
+          b.name = "Unnamed Block";
+        if (typeof b.duration !== "number" || b.duration <= 0) b.duration = 25; // Default duration
+      });
 
-    // Assign new IDs where needed
-    currentBlocks.forEach((b) => {
-      if (b.id === undefined) {
-        do {
-          maxId++;
-        } while (existingIds.has(maxId));
-        b.id = maxId;
-        existingIds.add(maxId);
-      }
-    });
+      // Assign new IDs where needed
+      currentBlocks.forEach((b) => {
+        if (b.id === undefined) {
+          do {
+            maxId++;
+          } while (existingIds.has(maxId));
+          b.id = maxId;
+          existingIds.add(maxId);
+        }
+      });
 
-    nextBlockId = maxId + 1; // Set next ID correctly
+      nextBlockId = maxId + 1; // Set next ID correctly
+    } else {
+      // Handle case where no initial data is received (e.g., first run)
+      sessionDurationInput.value = 25; // Default
+      breakDurationInput.value = 5; // Default
+      currentBlocks = [];
+      nextBlockId = 0;
+    }
 
-    // TODO: Potentially load session/break duration from initial data too if needed
-    // Example: if (initialConfig && initialConfig.sessionDuration) sessionDurationInput.value = initialConfig.sessionDuration;
-    renderBlockList(); // Initial render
+    renderBlockList(); // Initial render based on received or default data
   });
 } else {
   console.error(
