@@ -45,8 +45,8 @@ function createConfigWindow() {
   }
 
   configWindow = new BrowserWindow({
-    width: 400,
-    height: 650, // Adjust size as needed
+    width: 500,
+    height: 400, // Adjust size as needed
     title: "세션 구성",
     parent: mainWindow, // Make it a child of the main window
     modal: true, // Make it modal (optional, blocks interaction with parent)

@@ -301,3 +301,9 @@ if (
 // Initial render on load (might be empty until config is opened/saved)
 renderSession();
 resetSession(); // Ensure initial state is correct
+
+// --- 추가: 세션 시작, 일시정지, 초기화 버튼 이벤트 리스너 ---
+startSessionBtn.addEventListener("click", startSession);
+pauseSessionBtn.addEventListener("click", pauseSession); // 일시정지 버튼 리스너 추가
+resetSessionBtn.addEventListener("click", resetSession); // 초기화 버튼 리스너 추가
+// --- ---
