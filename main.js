@@ -9,6 +9,7 @@ function createWindow() {
     // Assign to mainWindow
     width: 800,
     height: 600,
+    resizable: false, // Prevent resizing
     webPreferences: {
       preload: path.join(__dirname, "preload.js"),
       contextIsolation: true,
@@ -38,10 +39,11 @@ function createConfigWindow() {
 
   configWindow = new BrowserWindow({
     width: 400,
-    height: 450, // Adjust size as needed
+    height: 650, // Adjust size as needed
     title: "세션 구성",
     parent: mainWindow, // Make it a child of the main window
     modal: true, // Make it modal (optional, blocks interaction with parent)
+    resizable: false, // Prevent resizing
     webPreferences: {
       preload: path.join(__dirname, "preload.js"), // Reuse the same preload script
       contextIsolation: true,
