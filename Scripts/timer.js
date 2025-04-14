@@ -22,7 +22,7 @@ let remainingTime = 0; // in seconds
 let isPaused = false;
 let currentRepetition = 1;
 let totalRepetitions = 1;
-let configBreakDuration = 5 * 60; // Default break duration in seconds, updated from config
+let isInfinite = false; // Flag for infinite repetitions
 
 // --- Block Management (Now primarily driven by config) ---
 
