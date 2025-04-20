@@ -23,6 +23,15 @@ let isPaused = false;
 let currentRepetition = 1;
 let totalRepetitions = 1;
 let isInfinite = false; // Flag for infinite repetitions
+let blockEndTime = 0; // in ms
+
+// typedef for session blocks
+/**
+ * @typedef {Object} Block
+ * @property {'task'|'break'} type - block type
+ * @property {string} description - block description
+ * @property {number} duration - duration in seconds
+ */
 
 // --- Block Management (Now primarily driven by config) ---
 
@@ -90,11 +99,13 @@ function renderSession() {
 function startSession() {
   if (sessionBlocks.length === 0) return;
 
-  // TODO: Re-evaluate session validation logic based on config structure.
-  // The old validation (task + ends with break) might not apply directly.
-  // For now, allow starting if there's at least one block.
-
-  totalRepetitions = parseInt(repetitionsInput.value, 10) || 1;
+  // Validate repetitions input
+  const reps = parseInt(repetitionsInput.value, 10);
+  if (isNaN(reps) || reps < 1) {
+    alert("반복 횟수를 1 이상의 숫자로 입력하세요."); // TODO: Replace with non-blocking validation UI
+    return;
+  }
+  totalRepetitions = reps;
   currentRepetition = 1;
   currentBlockIndex = 0;
   isPaused = false;
@@ -104,37 +115,37 @@ function startSession() {
   startSessionBtn.disabled = true;
   pauseSessionBtn.disabled = false;
   resetSessionBtn.disabled = false;
-  disableEditing(true); // Disable repetitions input during session
-  // TODO: Show progress bar
+  disableEditing(true);
 }
 
 function startBlock(index) {
   if (index >= sessionBlocks.length) {
-    // Finished all blocks in the current repetition
-    // TODO: Decide if a break (using configBreakDuration) should happen *between* repetitions.
-    // For now, just move to the next repetition or finish.
     handleRepetitionEnd();
     return;
   }
 
   const block = sessionBlocks[index];
-  remainingTime = block.duration; // Duration is already in seconds
+  // Set absolute end time
+  blockEndTime = Date.now() + block.duration * 1000;
   updateTimerDisplay();
   highlightCurrentBlock(index);
-  currentBlockTypeSpan.textContent = block.description; // Use block name
+  currentBlockTypeSpan.textContent = block.description;
 
-  clearInterval(timerInterval); // Clear any existing interval
+  clearInterval(timerInterval);
   timerInterval = setInterval(() => {
     if (isPaused) return;
 
-    remainingTime--;
+    // Calculate remaining time based on absolute endTime
+    const secondsLeft = Math.ceil((blockEndTime - Date.now()) / 1000);
+    remainingTime = secondsLeft > 0 ? secondsLeft : 0;
     updateTimerDisplay();
-    // TODO: Update progress bar based on remainingTime / block.duration
+
+    // TODO: Update progress bar: (block.duration - remainingTime) / block.duration * 100
 
     if (remainingTime <= 0) {
       clearInterval(timerInterval);
-      // TODO: Play notification sound/show popup using a more user-friendly method than alert.
-      // alert(`${block.description} 완료!`); // Simple alert for now
+      // TODO: Use Notification API or toast instead of alert
+      alert(`${block.description} 완료!`);
       moveToNextBlock();
     }
   }, 1000);
@@ -307,3 +318,16 @@ startSessionBtn.addEventListener("click", startSession);
 pauseSessionBtn.addEventListener("click", pauseSession); // 일시정지 버튼 리스너 추가
 resetSessionBtn.addEventListener("click", resetSession); // 초기화 버튼 리스너 추가
 // --- ---
+
+// Ensure timer accuracy on visibility change
+document.addEventListener("visibilitychange", () => {
+  if (
+    !document.hidden &&
+    currentBlockIndex >= 0 &&
+    remainingTime > 0 &&
+    !isPaused
+  ) {
+    // Re-sync display in case of throttling
+    updateTimerDisplay();
+  }
+});
