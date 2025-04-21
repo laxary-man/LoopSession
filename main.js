@@ -1,4 +1,4 @@
-const { app, BrowserWindow, ipcMain } = require("electron");
+const { app, BrowserWindow, ipcMain, Notification } = require("electron");
 const path = require("node:path");
 
 let mainWindow; // Keep a reference to the main window
@@ -104,6 +104,18 @@ app.whenReady().then(() => {
   ipcMain.on("close-config-window", () => {
     if (configWindow) {
       configWindow.close();
+    }
+  });
+
+  // Listen for request to show a notification
+  ipcMain.on("show-notification", (event, message) => {
+    // TODO: Add validation for the message content for security.
+    if (Notification.isSupported()) {
+      // TODO: Consider adding an icon to the notification.
+      new Notification({ title: "LoopSession", body: message }).show();
+    } else {
+      console.log("Notifications not supported on this system.");
+      // TODO: Implement a fallback notification mechanism if needed (e.g., flashing window).
     }
   });
 });

@@ -19,4 +19,7 @@ contextBridge.exposeInMainWorld("electronAPI", {
 
   // Config window -> Main process: Request to close itself
   closeConfigWindow: () => ipcRenderer.send("close-config-window"),
+
+  // Renderer -> Main process: Request to show a notification
+  sendNotification: (message) => ipcRenderer.send("show-notification", message),
 });

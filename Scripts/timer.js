@@ -145,7 +145,19 @@ function startBlock(index) {
     if (remainingTime <= 0) {
       clearInterval(timerInterval);
       // TODO: Use Notification API or toast instead of alert
-      alert(`${block.description} 완료!`);
+      // alert(`${block.description} 완료!`); <-- 기존 alert 제거
+      // Send notification via preload API
+      if (
+        window.electronAPI &&
+        typeof window.electronAPI.sendNotification === "function"
+      ) {
+        // TODO: Ensure block.description doesn't contain sensitive info before sending.
+        window.electronAPI.sendNotification(`${block.description} 완료!`);
+      } else {
+        console.error("electronAPI.sendNotification is not available.");
+        // Fallback alert if API is not available
+        alert(`${block.description} 완료!`);
+      }
       moveToNextBlock();
     }
   }, 1000);
@@ -172,7 +184,18 @@ function moveToNextBlock() {
 function sessionFinished() {
   clearInterval(timerInterval);
   // TODO: Use a less intrusive notification method.
-  alert("세션 완료!");
+  // alert("세션 완료!"); <-- 기존 alert 제거
+  // Send notification via preload API
+  if (
+    window.electronAPI &&
+    typeof window.electronAPI.sendNotification === "function"
+  ) {
+    window.electronAPI.sendNotification("세션 완료!");
+  } else {
+    console.error("electronAPI.sendNotification is not available.");
+    // Fallback alert if API is not available
+    alert("세션 완료!");
+  }
   resetSession();
   // TODO: Record statistics (e.g., total time, blocks completed).
 }
